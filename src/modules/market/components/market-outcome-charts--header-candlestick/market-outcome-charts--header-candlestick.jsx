@@ -9,6 +9,7 @@ import StylesHeader from 'modules/market/components/market-outcome-charts--heade
 
 export default class MarketOutcomeCandlestickHeader extends Component {
   static propTypes = {
+    showPeriodSelector: PropTypes.bool,
     outcomeName: PropTypes.string,
     updateChartHeaderHeight: PropTypes.func.isRequired,
     fixedPrecision: PropTypes.number.isRequired,
@@ -39,6 +40,7 @@ export default class MarketOutcomeCandlestickHeader extends Component {
       high,
       low,
       close,
+      showPeriodSelector,
       priceTimeSeries,
       selectedPeriod,
       selectedRange,
@@ -106,13 +108,13 @@ export default class MarketOutcomeCandlestickHeader extends Component {
               [Styles['MarketOutcomeChartsHeader__selector--mobile']]: isMobile,
             })}
           >
-            <PeriodSelector
+            { showPeriodSelector && <PeriodSelector
               priceTimeSeries={priceTimeSeries}
               updateSelectedPeriod={updateSelectedPeriod}
               updateSelectedRange={updateSelectedRange}
               selectedPeriod={selectedPeriod}
               selectedRange={selectedRange}
-            />
+            />}
           </div>
         </div>
       </section>

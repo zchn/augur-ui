@@ -4,7 +4,7 @@ import CustomPropTypes from 'utils/custom-prop-types'
 import * as d3 from 'd3'
 import ReactFauxDOM from 'react-faux-dom'
 
-import { map } from 'lodash/fp'
+import { map, isEmpty } from 'lodash/fp'
 
 import findPeriodSeriesBounds from 'modules/market/helpers/find-period-series-bounds'
 import MarketOutcomeChartsHeaderCandlestick from 'modules/market/components/market-outcome-charts--header-candlestick/market-outcome-charts--header-candlestick'
@@ -290,6 +290,7 @@ class MarketOutcomeCandlestick extends React.Component {
           high={hoveredPeriod.high}
           low={hoveredPeriod.low}
           close={hoveredPeriod.close}
+          showPeriodSelector={isEmpty(hoveredPeriod)}
           priceTimeSeries={priceTimeSeries}
           fixedPrecision={fixedPrecision}
           selectedPeriod={selectedPeriod}
