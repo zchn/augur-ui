@@ -140,6 +140,7 @@ export function updateTradesInProgress(marketId, outcomeId, side, numShares, lim
         const totalFee = createBigNumber(simulatedTrade.settlementFees, 10)
         newTradeDetails.totalFee = totalFee.toFixed()
         newTradeDetails.totalCost = simulatedTrade.tokensDepleted
+        newTradeDetails.sharesProvided = simulatedTrade.sharesDepleted === '0' ? simulatedTrade.otherSharesDepleted : simulatedTrade.sharesDepleted
         newTradeDetails.feePercent = totalFee.dividedBy(createBigNumber(simulatedTrade.tokensDepleted, 10)).toFixed()
         if (isNaN(newTradeDetails.feePercent)) newTradeDetails.feePercent = '0'
         dispatch({
