@@ -356,7 +356,6 @@ function determineDrawParams(options) {
     depthChart,
     marketDepth,
     orderBookKeys,
-    fixedPrecision,
     isMobile,
     marketMax,
     marketMin,
@@ -384,14 +383,12 @@ function determineDrawParams(options) {
   const maxDiff = createBigNumber(marketMinMax.mid.minus(marketMinMax.max).toPrecision(15)).absoluteValue() // NOTE -- toPrecision to address an error when attempting to get the absolute value
   const minDiff = createBigNumber(marketMinMax.mid.minus(marketMinMax.min).toPrecision(15)).absoluteValue()
 
-  let boundDiff = (maxDiff > minDiff ? maxDiff : minDiff)
+  const boundDiff = (maxDiff > minDiff ? maxDiff : minDiff).toNumber()
 
   const yDomain = [
-    createBigNumber(marketMinMax.mid.minus(boundDiff).toFixed(fixedPrecision)).toNumber(),
-    createBigNumber(marketMinMax.mid.plus(boundDiff).toFixed(fixedPrecision)).toNumber(),
+    marketMin.toNumber(),
+    marketMax.toNumber(),
   ]
-
-  boundDiff = boundDiff.toNumber()
 
   const xScale = d3.scaleLinear()
     .domain(isMobile ? d3.extent(xDomain).sort((a, b) => b - a) : d3.extent(xDomain))

@@ -359,8 +359,8 @@ function determineDrawParams({
 
 
   const yDomain = [
-    createBigNumber(orderBookKeys.mid.plus(boundDiff).toFixed(fixedPrecision)).toNumber(),
-    createBigNumber(orderBookKeys.mid.minus(boundDiff).toFixed(fixedPrecision)).toNumber(),
+    marketMin.toNumber(),
+    marketMax.toNumber(),
   ]
 
   boundDiff = boundDiff.toNumber()
