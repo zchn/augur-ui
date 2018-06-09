@@ -255,7 +255,6 @@ export default class MarketOutcomeDepth extends Component {
         containerWidth,
         marketMin,
         marketMax,
-        fixedPrecision,
       } = options
 
       if (hoveredPrice == null) {
@@ -284,7 +283,6 @@ export default class MarketOutcomeDepth extends Component {
           d3.select('#crosshairX')
             .style('display', 'none')
         }
-        const yPosition = yScale(hoveredPrice)
 
         d3.select('#crosshairY')
           .attr('x1', 0)
