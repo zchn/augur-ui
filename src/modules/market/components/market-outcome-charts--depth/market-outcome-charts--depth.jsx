@@ -285,7 +285,6 @@ export default class MarketOutcomeDepth extends Component {
             .style('display', 'none')
         }
         const yPosition = yScale(hoveredPrice)
-        const clampedHoveredPrice = yScale.invert(yPosition)
 
         d3.select('#crosshairY')
           .attr('x1', 0)
@@ -296,7 +295,7 @@ export default class MarketOutcomeDepth extends Component {
         d3.select('#hovered_price_label')
           .attr('x', 0)
           .attr('y', yScale(hoveredPrice) + 12)
-          .text(clampedHoveredPrice.toFixed(fixedPrecision))
+          .text(hoveredPrice)
       }
     }
   }
@@ -384,7 +383,7 @@ function determineDrawParams(options) {
   const maxDiff = createBigNumber(marketMinMax.mid.minus(marketMinMax.max).toPrecision(15)).absoluteValue() // NOTE -- toPrecision to address an error when attempting to get the absolute value
   const minDiff = createBigNumber(marketMinMax.mid.minus(marketMinMax.min).toPrecision(15)).absoluteValue()
 
-  let boundDiff = (maxDiff > minDiff ? maxDiff : minDiff)
+  let boundDiff = (maxDiff < minDiff ? maxDiff : minDiff)
 
   const yDomain = [
     createBigNumber(marketMinMax.mid.minus(boundDiff).toFixed(fixedPrecision)).toNumber(),
@@ -472,36 +471,6 @@ function drawTicks(options) {
       .text(orderBookKeys.mid && orderBookKeys.mid.toFixed(fixedPrecision))
   }
 
-  //  Offset Ticks
-  const offsetTicks = drawParams.yDomain.map((d, i) => { // Assumes yDomain is [min, max]
-    if (i === 0) {
-      return d + (drawParams.boundDiff / 4)
-    }
-    return d - (drawParams.boundDiff / 4)
-  })
-
-  const yTicks = depthChart.append('g')
-    .attr('id', 'depth_y_ticks')
-
-  yTicks.selectAll('line')
-    .data(offsetTicks)
-    .enter()
-    .append('line')
-    .attr('class', 'tick-line')
-    .attr('x1', 0)
-    .attr('x2', drawParams.containerWidth)
-    .attr('y1', d => drawParams.yScale(d))
-    .attr('y2', d => drawParams.yScale(d))
-  yTicks.selectAll('text')
-    .data(offsetTicks)
-    .enter()
-    .append('text')
-    .attr('class', 'tick-value')
-    .attr('x', 0)
-    .attr('y', d => drawParams.yScale(d))
-    .attr('dx', 0)
-    .attr('dy', drawParams.chartDim.tickOffset)
-    .text(d => d.toFixed(fixedPrecision))
 
   //  Min/Max Boundary Lines
   const rangeBounds = depthChart.append('g')
@@ -514,14 +483,6 @@ function drawTicks(options) {
       .attr('x2', drawParams.containerWidth)
       .attr('y1', () => drawParams.yScale(orderBookKeys.min))
       .attr('y2', () => drawParams.yScale(orderBookKeys.min))
-
-    rangeBounds.append('text')
-      .attr('class', 'tick-value')
-      .attr('x', 0)
-      .attr('y', d => drawParams.yScale(orderBookKeys.min))
-      .attr('dx', 50)
-      .attr('dy', drawParams.chartDim.tickOffset)
-      .text('min')
 
     rangeBounds.append('rect')
       .attr('class', 'bounding-box')
@@ -537,14 +498,6 @@ function drawTicks(options) {
       .attr('x2', drawParams.containerWidth)
       .attr('y1', () => drawParams.yScale(orderBookKeys.max))
       .attr('y2', () => drawParams.yScale(orderBookKeys.max))
-
-    rangeBounds.append('text')
-      .attr('class', 'tick-value')
-      .attr('x', 0)
-      .attr('y', d => drawParams.yScale(orderBookKeys.max))
-      .attr('dx', 50)
-      .attr('dy', drawParams.chartDim.tickOffset)
-      .text('max')
 
     rangeBounds.append('rect')
       .attr('class', 'bounding-box')
