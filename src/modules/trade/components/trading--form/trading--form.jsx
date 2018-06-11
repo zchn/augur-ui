@@ -29,8 +29,8 @@ class MarketTradingForm extends Component {
     orderQuantity: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]).isRequired,
     orderType: PropTypes.string.isRequired,
     selectedNav: PropTypes.string.isRequired,
-    selectedOutcome: PropTypes.object.isRequired,
     updateState: PropTypes.func.isRequired,
+    selectedOutcome: PropTypes.object,
   }
 
   constructor(props) {

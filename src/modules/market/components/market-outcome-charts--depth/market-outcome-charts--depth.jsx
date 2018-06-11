@@ -23,7 +23,7 @@ export default class MarketOutcomeDepth extends Component {
     updateChartHeaderHeight: PropTypes.func.isRequired,
     updateHoveredPrice: PropTypes.func.isRequired,
     updateHoveredDepth: PropTypes.func.isRequired,
-    updateSeletedOrderProperties: PropTypes.func.isRequired,
+    updateSelectedOrderProperties: PropTypes.func.isRequired,
     marketMin: CustomPropTypes.bigNumber, /* required */
     marketMax: CustomPropTypes.bigNumber, /* required */
     hoveredDepth: PropTypes.array.isRequired,
@@ -57,7 +57,7 @@ export default class MarketOutcomeDepth extends Component {
       orderBookKeys,
       sharedChartMargins,
       updateHoveredPrice,
-      updateSeletedOrderProperties,
+      updateSelectedOrderProperties,
       isMobile,
     } = this.props
     this.drawDepth({
@@ -68,7 +68,7 @@ export default class MarketOutcomeDepth extends Component {
       marketMin,
       marketMax,
       updateHoveredPrice,
-      updateSeletedOrderProperties,
+      updateSelectedOrderProperties,
       isMobile,
     })
 
@@ -85,7 +85,7 @@ export default class MarketOutcomeDepth extends Component {
       orderBookKeys,
       sharedChartMargins,
       updateHoveredPrice,
-      updateSeletedOrderProperties,
+      updateSelectedOrderProperties,
       isMobile,
     } = this.props
     if (
@@ -93,7 +93,7 @@ export default class MarketOutcomeDepth extends Component {
       !isEqual(orderBookKeys, nextProps.orderBookKeys) ||
       !isEqual(sharedChartMargins, nextProps.sharedChartMargins) ||
       !isEqual(updateHoveredPrice, nextProps.updateHoveredPrice) ||
-      !isEqual(updateSeletedOrderProperties, nextProps.updateSeletedOrderProperties) ||
+      !isEqual(updateSelectedOrderProperties, nextProps.updateSelectedOrderProperties) ||
       fixedPrecision !== nextProps.fixedPrecision ||
       marketMin !== nextProps.marketMin ||
       marketMax !== nextProps.marketMax ||
@@ -107,7 +107,7 @@ export default class MarketOutcomeDepth extends Component {
         marketMin: nextProps.marketMin,
         marketMax: nextProps.marketMax,
         updateHoveredPrice: nextProps.updateHoveredPrice,
-        updateSeletedOrderProperties: nextProps.updateSeletedOrderProperties,
+        updateSelectedOrderProperties: nextProps.updateSelectedOrderProperties,
         isMobile: nextProps.isMobile,
       })
     }
@@ -150,7 +150,7 @@ export default class MarketOutcomeDepth extends Component {
         marketMin,
         marketMax,
         updateHoveredPrice,
-        updateSeletedOrderProperties,
+        updateSelectedOrderProperties,
         isMobile,
       } = options
 
@@ -207,7 +207,7 @@ export default class MarketOutcomeDepth extends Component {
         marketMin,
         marketMax,
         updateHoveredPrice,
-        updateSeletedOrderProperties,
+        updateSelectedOrderProperties,
       })
 
       this.setState({
@@ -229,7 +229,7 @@ export default class MarketOutcomeDepth extends Component {
       orderBookKeys,
       sharedChartMargins,
       updateHoveredPrice,
-      updateSeletedOrderProperties,
+      updateSelectedOrderProperties,
     } = this.props
     this.drawDepth({
       marketDepth,
@@ -239,7 +239,7 @@ export default class MarketOutcomeDepth extends Component {
       marketMin,
       marketMax,
       updateHoveredPrice,
-      updateSeletedOrderProperties,
+      updateSelectedOrderProperties,
     })
   }
 
@@ -284,8 +284,6 @@ export default class MarketOutcomeDepth extends Component {
           d3.select('#crosshairX')
             .style('display', 'none')
         }
-        const yPosition = yScale(hoveredPrice)
-        const clampedHoveredPrice = yScale.invert(yPosition)
 
         d3.select('#crosshairY')
           .attr('x1', 0)
@@ -296,7 +294,7 @@ export default class MarketOutcomeDepth extends Component {
         d3.select('#hovered_price_label')
           .attr('x', 0)
           .attr('y', yScale(hoveredPrice) + 12)
-          .text(clampedHoveredPrice.toFixed(fixedPrecision))
+          .text(hoveredPrice)
       }
     }
   }
@@ -378,20 +376,15 @@ function determineDrawParams(options) {
   const containerHeight = depthChart.clientHeight
   const drawHeight = containerHeight - chartDim.top - chartDim.bottom
 
-  const xDomain = Object.keys(marketDepth).reduce((p, side) => [...p, ...marketDepth[side].reduce((p, item) => [...p, item[0].toNumber()], [])], [0])
+  const yDomain = Object.keys(marketDepth).reduce((p, side) => [...p, ...marketDepth[side].reduce((p, item) => [...p, item[0].toNumber()], [])], [0])
 
   // Determine bounding diff
   const maxDiff = createBigNumber(marketMinMax.mid.minus(marketMinMax.max).toPrecision(15)).absoluteValue() // NOTE -- toPrecision to address an error when attempting to get the absolute value
   const minDiff = createBigNumber(marketMinMax.mid.minus(marketMinMax.min).toPrecision(15)).absoluteValue()
 
-  let boundDiff = (maxDiff > minDiff ? maxDiff : minDiff)
+  const boundDiff = (maxDiff > minDiff ? maxDiff : minDiff).toNumber()
 
-  const yDomain = [
-    createBigNumber(marketMinMax.mid.minus(boundDiff).toFixed(fixedPrecision)).toNumber(),
-    createBigNumber(marketMinMax.mid.plus(boundDiff).toFixed(fixedPrecision)).toNumber(),
-  ]
-
-  boundDiff = boundDiff.toNumber()
+  const xDomain = [marketMin, marketMax]
 
   const xScale = d3.scaleLinear()
     .domain(isMobile ? d3.extent(xDomain).sort((a, b) => b - a) : d3.extent(xDomain))
@@ -461,67 +454,17 @@ function drawTicks(options) {
     .attr('y1', (d, i) => ((drawParams.containerHeight - drawParams.chartDim.bottom)) * i)
     .attr('y2', (d, i) => ((drawParams.containerHeight - drawParams.chartDim.bottom)) * i)
 
-  //  Midpoint Label
-  if (!isMobile) {
-    depthChart.append('text')
-      .attr('class', 'tick-value')
-      .attr('x', 0)
-      .attr('y', drawParams.yScale(orderBookKeys.mid))
-      .attr('dx', 0)
-      .attr('dy', drawParams.chartDim.tickOffset)
-      .text(orderBookKeys.mid && orderBookKeys.mid.toFixed(fixedPrecision))
-  }
-
-  //  Offset Ticks
-  const offsetTicks = drawParams.yDomain.map((d, i) => { // Assumes yDomain is [min, max]
-    if (i === 0) {
-      return d + (drawParams.boundDiff / 4)
-    }
-    return d - (drawParams.boundDiff / 4)
-  })
-
-  const yTicks = depthChart.append('g')
-    .attr('id', 'depth_y_ticks')
-
-  yTicks.selectAll('line')
-    .data(offsetTicks)
-    .enter()
-    .append('line')
-    .attr('class', 'tick-line')
-    .attr('x1', 0)
-    .attr('x2', drawParams.containerWidth)
-    .attr('y1', d => drawParams.yScale(d))
-    .attr('y2', d => drawParams.yScale(d))
-  yTicks.selectAll('text')
-    .data(offsetTicks)
-    .enter()
-    .append('text')
-    .attr('class', 'tick-value')
-    .attr('x', 0)
-    .attr('y', d => drawParams.yScale(d))
-    .attr('dx', 0)
-    .attr('dy', drawParams.chartDim.tickOffset)
-    .text(d => d.toFixed(fixedPrecision))
-
   //  Min/Max Boundary Lines
   const rangeBounds = depthChart.append('g')
     .attr('id', 'depth_range_bounds')
 
-  if (drawParams.yDomain[0] < marketMin) {
+  if (drawParams.xDomain[0] < marketMin) {
     rangeBounds.append('line')
       .attr('class', 'tick-line')
       .attr('x1', 0)
       .attr('x2', drawParams.containerWidth)
       .attr('y1', () => drawParams.yScale(orderBookKeys.min))
       .attr('y2', () => drawParams.yScale(orderBookKeys.min))
-
-    rangeBounds.append('text')
-      .attr('class', 'tick-value')
-      .attr('x', 0)
-      .attr('y', d => drawParams.yScale(orderBookKeys.min))
-      .attr('dx', 50)
-      .attr('dy', drawParams.chartDim.tickOffset)
-      .text('min')
 
     rangeBounds.append('rect')
       .attr('class', 'bounding-box')
@@ -530,21 +473,13 @@ function drawTicks(options) {
       .attr('height', drawParams.drawHeight - drawParams.yScale(orderBookKeys.min))
       .attr('width', drawParams.containerWidth)
 
-  } else if (drawParams.yDomain[drawParams.yDomain.length - 1] > marketMax) {
+  } else if (drawParams.xDomain[drawParams.xDomain.length - 1] > marketMax) {
     rangeBounds.append('line')
       .attr('class', 'tick-line')
       .attr('x1', 0)
       .attr('x2', drawParams.containerWidth)
       .attr('y1', () => drawParams.yScale(orderBookKeys.max))
       .attr('y2', () => drawParams.yScale(orderBookKeys.max))
-
-    rangeBounds.append('text')
-      .attr('class', 'tick-value')
-      .attr('x', 0)
-      .attr('y', d => drawParams.yScale(orderBookKeys.max))
-      .attr('dx', 50)
-      .attr('dy', drawParams.chartDim.tickOffset)
-      .text('max')
 
     rangeBounds.append('rect')
       .attr('class', 'bounding-box')
@@ -649,7 +584,7 @@ function attachHoverClickHandlers(options) {
     marketMin,
     marketMax,
     updateHoveredPrice,
-    updateSeletedOrderProperties,
+    updateSelectedOrderProperties,
   } = options
 
   depthChart.append('rect')
@@ -676,7 +611,7 @@ function attachHoverClickHandlers(options) {
         orderPrice > marketMin &&
         orderPrice < marketMax
       ) {
-        updateSeletedOrderProperties({
+        updateSelectedOrderProperties({
           selectedNav: orderPrice > orderBookKeys.mid ? BUY : SELL,
           orderPrice: nearestFillingOrder[1],
           orderQuantity: nearestFillingOrder[0],
