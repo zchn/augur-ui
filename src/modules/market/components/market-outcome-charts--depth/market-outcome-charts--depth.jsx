@@ -255,7 +255,6 @@ export default class MarketOutcomeDepth extends Component {
         containerWidth,
         marketMin,
         marketMax,
-        fixedPrecision,
       } = options
 
       if (hoveredPrice == null) {
@@ -354,7 +353,6 @@ function determineDrawParams(options) {
     depthChart,
     marketDepth,
     orderBookKeys,
-    fixedPrecision,
     isMobile,
     marketMax,
     marketMin,
@@ -434,10 +432,8 @@ function drawTicks(options) {
     drawParams,
     depthChart,
     orderBookKeys,
-    fixedPrecision,
     marketMin,
     marketMax,
-    isMobile,
   } = options
 
   // Y Axis
