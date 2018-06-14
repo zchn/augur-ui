@@ -749,7 +749,7 @@ babel-code-frame@^6.11.0, babel-code-frame@^6.22.0, babel-code-frame@^6.26.0:
     esutils "^2.0.2"
     js-tokens "^3.0.2"
 
-babel-core@^6.0.0, babel-core@^6.26.0, babel-core@^6.26.3:
+babel-core@6.26.3, babel-core@^6.0.0, babel-core@^6.26.0, babel-core@^6.26.3:
   version "6.26.3"
   resolved "https://registry.yarnpkg.com/babel-core/-/babel-core-6.26.3.tgz#b2e2f09e342d0f0c88e2f02e067794125e75c207"
   dependencies:
@@ -10363,6 +10363,12 @@ redux-thunk@2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.2.0.tgz#e615a16e16b47a19a515766133d1e3e99b7852e5"
 
+redux-whenever@2.0.8:
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/redux-whenever/-/redux-whenever-2.0.8.tgz#fe2d5046b00f8c126191b8e2b596d7d76ddc4af3"
+  dependencies:
+    safe-chain "^3.0.1"
+
 redux@3.6.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/redux/-/redux-3.6.0.tgz#887c2b3d0b9bd86eca2be70571c27654c19e188d"
@@ -10842,6 +10848,10 @@ safe-buffer@5.1.1:
 safe-buffer@^5.0.1, safe-buffer@^5.1.0, safe-buffer@^5.1.1, safe-buffer@^5.1.2, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.2.tgz#991ec69d296e0313747d59bdfd2b745c35f8828d"
+
+safe-chain@^3.0.1:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/safe-chain/-/safe-chain-3.0.5.tgz#7d1b0dd3e662ecd1c5bfbad15bac472b0d44dd56"
 
 safe-regex@^1.1.0:
   version "1.1.0"
