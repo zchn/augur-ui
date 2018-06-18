@@ -18,30 +18,11 @@ services:
     entrypoint: /app/wait-for-url.sh http://geth:8545 /app/docker-entrypoint.sh
 
   augur-ui:
-    image: augur-ui-integration-test
     build:
       context: .
       dockerfile: Dockerfile-integration
       cache_from:
         - augur-ui-integration-test
-    environment:
-      - ETHEREUM_NETWORK=integration
     depends_on:
       - augur-node-service
-    entrypoint: /app/wait-for-url.sh http://augur-node-service:9001/status/sync yarn start
-
-  test-runner:
-    image: augur-ui-integration-test
-    links:
-      - geth
-      - augur-node-service
-      - augur-ui
-    depends_on:
-      - augur-ui
-    environment:
-      - AUGUR_URL=http://augur-ui:8080/
-    cap_add:
-      - SYS_ADMIN
-    entrypoint: /app/wait-for-url.sh http://augur-ui:8080/ npx jest
-
-
+    entrypoint: /app/wait-for-url.sh http://augur-node-service:9001/status/sync yarn integration:headless
