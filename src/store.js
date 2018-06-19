@@ -54,7 +54,11 @@ const store = createStore(combineReducers({
 
 if (process.env.NODE_ENV === 'development') {
   Object.defineProperty(window, 'state', { get: store.getState, enumerable: true })
+
+  console.log('helpers added')
   window.integrationHelpers = helpers(store)
+} else {
+  console.log('not development')
 }
 
 if (module.hot) {

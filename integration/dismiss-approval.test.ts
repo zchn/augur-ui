@@ -7,21 +7,18 @@ const url = `${process.env.AUGUR_URL}`;
 jest.setTimeout(100000);
 
 describe("Trading", () => {
-  beforeAll(async () => {
-    await page.goto(url);
-
-    const marketId = await page.evaluate((marketDescription) => window.integrationHelpers.findMarketId(marketDescription), 'Will the Larsen B ice shelf collapse by the end of November 2019?');
-
-    await page.goto(url.concat('/#/market?id=' + marketId));
+  it("should display a modal", async () => {
+    page.on('console', msg => console.log('PAGE LOG:', msg.text()));
 
     // No idea what a 'typical' desktop resolution would be for our users.
     await page.setViewport({
       height: 1200,
       width: 1200
     });
-  });
 
-  it("should display a modal", async () => {
+    const marketId = await page.evaluate((marketDescription) => window.integrationHelpers.findMarketId(marketDescription), 'Will the Larsen B ice shelf collapse by the end of November 2019?');
+
+    await page.goto(url.concat('/#/market?id=' + marketId), { waitUntil: "networkidle0"});
     await dismissDisclaimerModal(page);
 
     await expect(page).toClick("button", {
@@ -39,7 +36,7 @@ describe("Trading", () => {
       text: "Confirm"
     });
 
-    page.on('console', msg => console.log('PAGE LOG:', msg.text()));
+
 
     await page.evaluate((account) => window.integrationHelpers.updateAccountAddress(account), UnlockedAccounts.SECONDARY_ACCOUNT);
     await expect(page).toClick("button", {
