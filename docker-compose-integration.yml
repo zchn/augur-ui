@@ -25,4 +25,5 @@ services:
         - augur-ui-integration-test
     depends_on:
       - augur-node-service
-    entrypoint: /app/wait-for-url.sh http://augur-node-service:9001/status/sync yarn integration:headless
+
+    entrypoint: /app/wait-for-url.sh http://augur-node-service:9001/status/sync /opt/bin/entry_point.sh yarn integration integration/dismiss-approval.test.ts

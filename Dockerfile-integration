@@ -1,43 +1,30 @@
 # Using slim here because we need chromium for puppeteer
 #
-FROM node:9-alpine
+FROM selenium/node-chrome
 
-RUN apk add --update \
+USER root
+
+RUN apt-get update
+RUN apt-get install --yes curl
+
+RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+RUN apt-get update && apt-get install -y nodejs yarn
+
+RUN apt-get install --yes \
+    dbus-x11 \
+    ttf-freefont \
     python \
     python-dev \
-    py-pip \
+    python-pip \
     git \
-    curl \
-    bash \
     musl \
-    libressl-dev \
-    libc6-compat \
-    linux-headers \
-    build-base \
-    gmp-dev \
+    build-essential \
     libffi-dev \
-    libusb-dev
+    libusb-1.0-0-dev
 
-# Update apk repositories
-RUN echo "http://dl-2.alpinelinux.org/alpine/edge/main" > /etc/apk/repositories
-RUN echo "http://dl-2.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
-RUN echo "http://dl-2.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
-
-# Install chromium
-RUN apk -U --no-cache \
-	--allow-untrusted add \
-    zlib-dev \
-    chromium \
-    nss \
-    xvfb \
-    wait4ports \
-    xorg-server \
-    dbus \
-    ttf-freefont \
-    mesa-dri-swrast \
-    mesa-gles \
-    grep \
-    udev
+COPY entry_point.sh /opt/bin/
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
@@ -54,12 +41,10 @@ RUN git init \
 
 COPY . /app
 
-RUN NODE_ENV='development' ETHEREUM_NETWORK=integration yarn build --dev
+RUN ETHEREUM_NETWORK=integration yarn build --dev
 
 # Add Chrome as a user. Without this chrome requires that it be run --without-sandbox
 # which jest-puppetter doesn't do by default. So, to keep the sandboxing for the
 # running of these tests we gotta add a group and user for chrome
-RUN  adduser -D chrome
-# Run Chrome non-privileged
-USER chrome
-CMD ["bash"]
+USER seluser
+# CMD ["xvfb-run --auto-servernum"]
