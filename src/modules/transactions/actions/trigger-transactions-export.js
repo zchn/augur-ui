@@ -15,6 +15,6 @@ export const triggerTransactionsExport = () => (dispatch, getState) => {
     a.click()
   } else {
     // trigger load all transactions and give it this function as a callback.
-    dispatch(loadAccountHistory(true, triggerTransactionsExport))
+    dispatch(loadAccountHistory(true, triggerTransactionsExport, null))
   }
 }

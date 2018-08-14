@@ -24,6 +24,7 @@ export default class Transactions extends Component {
     transactionsLoading: PropTypes.bool,
     updateTransactionPeriod: PropTypes.func.isRequired,
     loadAccountCompleteSets: PropTypes.func.isRequired,
+    getDefaultTransactionPeriod: PropTypes.func.isRequired,
   }
 
   constructor(props) {
@@ -49,11 +50,18 @@ export default class Transactions extends Component {
   componentWillMount() {
     this.loadTransactions(this.state.transactionPeriodDefault)
     this.props.loadAccountCompleteSets()
+    this.props.getDefaultTransactionPeriod()
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.transactionPeriod !== this.state.transactionPeriod) {
       this.loadTransactions(this.state.transactionPeriod)
+    }
+  }
+
+  componentWillReceiveProps(nextProps){
+    if (nextProps.transactionPeriod !== this.props.transactionPeriod) {
+        this.setState({transactionPeriod: nextProps.transactionPeriod});
     }
   }
 

@@ -7,7 +7,7 @@ import { updateTransactionsLoading } from 'modules/transactions/actions/update-t
 import { clearTransactions } from 'modules/transactions/actions/delete-transaction'
 import { augur } from 'services/augurjs'
 
-export const loadAccountHistory = (beginTime, endTime) => (dispatch, getState) => {
+export const loadAccountHistory = (beginTime, endTime, cb) => (dispatch, getState) => {
   const options = {
     earliestCreationTime: beginTime,
     latestCreationTime: endTime,
@@ -15,6 +15,7 @@ export const loadAccountHistory = (beginTime, endTime) => (dispatch, getState) =
 
   loadTransactions(dispatch, getState, options, () => {
     dispatch(updateTransactionsLoading(false))
+    cb && cb()
   })
 }
 
